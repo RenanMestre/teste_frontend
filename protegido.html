@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Área Protegida</title>
+  <style>
+    #conteudo {
+      font-size: 18px;
+      font-weight: bold;
+    }
+    .ok {
+      color: green;
+    }
+    .erro {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <h1>Área Protegida</h1>
+  <p id="conteudo">Verificando acesso...</p>
+
+  <script>
+    const token = localStorage.getItem('token');
+    const conteudo = document.getElementById('conteudo');
+
+    if (!token) {
+      conteudo.textContent = 'Você precisa estar logado.';
+      conteudo.className = 'erro';
+      setTimeout(() => {
+        window.location.href = 'index.html';
+      }, 2000);
+    } else {
+      fetch('https://teste-backend-62ad.onrender.com/api/auth/protected', {
+        method: 'GET',
+        headers: {
+          'Authorization': 'Bearer ' + token
+        }
+      })
+      .then(response => {
+        if (response.ok) {
+          return response.text();
+        } else {
+          throw new Error('Token inválido');
+        }
+      })
+      .then(data => {
+        conteudo.textContent = data;
+        conteudo.className = 'ok';
+      })
+      .catch(error => {
+        conteudo.textContent = 'Acesso negado: ' + error.message;
+        conteudo.className = 'erro';
+        setTimeout(() => {
+          window.location.href = 'index.html';
+        }, 2000);
+      });
+    }
+  </script>
+</body>
+</html>
